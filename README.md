@@ -21,7 +21,7 @@ Every music app looks the same. Podium brings back the wheel: one wheel to move,
 choose, and everything about the device yours to change. Your own music comes first, an online
 catalogue is built in, and there are no ads and no analytics.
 
-This public community fork keeps the original Podium project and its history, with Jellyfin support,
+This public community edition builds on the original Podium project, with Jellyfin support,
 Portuguese (Brazil) translations and library navigation improvements maintained here.
 
 <p align="center"><img src="docs/media/screens.jpg" alt="Podium in Silver, Carbon, Burgundy with stickers, Bone and Glacier blue" width="100%" /></p>

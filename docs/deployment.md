@@ -50,11 +50,24 @@ SemVer `versionName` (`0.x` until v1.0); `versionCode` = `major*1_000_000 + mino
 - CI: keystore as base64 secret → decoded at build time; passwords as secrets; never echoed.
 - Play App Signing recommended if Play is chosen (upload key ≠ app signing key).
 
-## 6. CI (GitHub Actions, once a remote exists)
-- `pr.yml`: assembleDebug, unit + Robolectric tests, Roborazzi verify, lint, dependency-guard, APK size check.
-- `release.yml` (tag `v*`): assembleRelease + bundleRelease, signing, checksums, GitHub Release with APK + AAB + SHA-256 + changelog excerpt.
+## 6. CI (GitHub Actions)
+- `.github/workflows/release.yml` (tag `v*`): assembles the Jellyfin update APK, calculates its SHA-256, and publishes a GitHub Release with the matching notes.
+- The release workflow builds `app.podium.jellyfin.debug` so an update replaces this edition's installed development package.
 - `benchmark.yml` (manual dispatch): Macrobenchmark on a connected/self-hosted device or Firebase Test Lab (paid → user decision).
 - Caching: Gradle build cache + configuration cache; JDK 21 Temurin.
+
+Before the first automated release, add these GitHub Actions secrets under **Settings → Secrets and variables → Actions**:
+
+| Secret | Value |
+|---|---|
+| `PODIUM_UPDATE_KEYSTORE_BASE64` | Base64 encoding of the signing keystore |
+| `PODIUM_UPDATE_KEYSTORE_PASSWORD` | Keystore password |
+| `PODIUM_UPDATE_KEY_ALIAS` | Signing key alias |
+| `PODIUM_UPDATE_KEY_PASSWORD` | Signing key password |
+
+Use the same signing certificate as the APK already installed on devices that should receive updates.
+The keystore and passwords must stay in Actions secrets and outside the Git repository. Until these
+secrets are configured and a `v*` tag is pushed, the repository has no installable latest-release APK.
 
 ## 7. Distribution options (decision for the user)
 | Channel | Fit | Notes |
@@ -65,7 +78,7 @@ SemVer `versionName` (`0.x` until v1.0); `versionCode` = `major*1_000_000 + mino
 
 ## 7a. Publishing a release (D-69)
 1. `./gradlew :app:assembleRelease` and check it: `apksigner verify --print-certs` names `CN=Podium`;
-   `aapt dump badging` shows `app.podium` and no `application-debuggable`.
+   `aapt dump badging` shows this edition's package ID and no `application-debuggable`.
 2. Publish a GitHub Release tagged `v<versionName>` with the APK attached as `podium.apk`, so
    `releases/latest/download/podium.apk` (the website's and README's download link) always serves
    the newest one. Its notes are `docs/releases/v<versionName>.md` (committed with the version
