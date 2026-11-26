@@ -19,9 +19,9 @@ android {
     defaultConfig {
         // Provisional: the product name is pending trademark clearance (docs/repository-audit.md §5).
         applicationId = "app.podium.jellyfin"
-        // Jellyfin Edition's first update release: keep these defaults in sync with CHANGELOG.md.
-        versionCode = providers.gradleProperty("podium.versionCode").orNull?.toInt() ?: 8
-        versionName = providers.gradleProperty("podium.versionName").orNull ?: "0.1.5.2"
+        // Jellyfin Edition update release: keep these defaults in sync with CHANGELOG.md.
+        versionCode = providers.gradleProperty("podium.versionCode").orNull?.toInt() ?: 9
+        versionName = providers.gradleProperty("podium.versionName").orNull ?: "0.1.5.3"
     }
     buildFeatures {
         buildConfig = true
@@ -69,8 +69,9 @@ android {
         }
         release {
             sideBySide?.let { applicationIdSuffix = it }
-            isMinifyEnabled = true
-            isShrinkResources = true
+            val minifyRelease = providers.gradleProperty("podium.minifyRelease").orNull?.toBooleanStrictOrNull() ?: true
+            isMinifyEnabled = minifyRelease
+            isShrinkResources = minifyRelease
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.findByName("release")
         }

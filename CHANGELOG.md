@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5.3] - 2026-11-26
+
+### Added
+- **About screen:** Settings now credits the original Podium creator and repository, then José Casallecchio and the Jellyfin Edition repository, with links and GPL-3.0 details.
+
+### Changed
+- **Brazilian Portuguese:** Finish translating the track menu, including favorites, album and artist navigation, and clearing the upcoming queue.
+- **Update settings label:** Use “Atualização” in Portuguese for the update setting.
+
 ## [0.1.5.2] - 2026-11-26
 
 ### Added

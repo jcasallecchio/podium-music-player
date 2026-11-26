@@ -208,6 +208,7 @@ import app.podium.space.PodiumSpace
 import app.podium.feature.settings.MusicFoldersScreen
 import app.podium.feature.settings.OnlineServiceScreen
 import app.podium.feature.settings.JellyfinSettingsScreen
+import app.podium.feature.settings.AboutScreen
 import app.podium.feature.settings.SettingsScreen
 import app.podium.feature.settings.ThemeScreen
 import app.podium.feature.settings.VirtualDisplayScreen
@@ -252,6 +253,7 @@ sealed interface Dest {
     /** Now Playing ▸ Lyrics: the whole display is the lyric (no header, no mini player). */
     data object Lyrics : Dest
     data object Settings : Dest
+    data object About : Dest
 
     /** Settings ▸ Appearance (D-41) and its two halves. */
     data object Appearance : Dest
@@ -298,7 +300,7 @@ sealed interface Dest {
 
 private val fixedDests = listOf(
     Dest.Home, Dest.Music, Dest.CoverFlow, Dest.Albums, Dest.Artists, Dest.Songs, Dest.Favorites, Dest.Playlists, Dest.NowPlaying,
-    Dest.UpNext, Dest.Lyrics, Dest.Settings, Dest.Appearance, Dest.DeviceBody, Dest.VirtualDisplay, Dest.Theme, Dest.Font,
+    Dest.UpNext, Dest.Lyrics, Dest.Settings, Dest.About, Dest.Appearance, Dest.DeviceBody, Dest.VirtualDisplay, Dest.Theme, Dest.Font,
     Dest.LyricsFont, Dest.LyricsTheme, Dest.Background, Dest.Finish, Dest.CustomColor, Dest.DisplayColor, Dest.OnlineSources, Dest.JellyfinSettings, Dest.Equalizer,
     Dest.CustomSources, Dest.AddCustomSource,
 ).associateBy { it.toString() }
@@ -360,6 +362,7 @@ private fun titleOf(dest: Dest, graph: AppGraph): String = when (dest) {
     Dest.UpNext -> "Up Next"
     Dest.Lyrics -> "Lyrics"
     Dest.Settings -> "Settings"
+    Dest.About -> "About"
     is Dest.MusicFolders -> if (dest.path.isEmpty()) "Music folders" else dest.path.trimEnd('/').substringAfterLast('/')
     is Dest.Online -> dest.place.title
     Dest.Appearance -> "Appearance"
@@ -1212,7 +1215,9 @@ private fun ScreenContent(
             softwareUpdate = remember(graph) { app.podium.update.SoftwareUpdate(graph.updates, checksByItself = !BuildConfig.DEBUG) },
             jellyfinSync = graph.jellyfinSync,
             onJellyfin = { navigator.push(Dest.JellyfinSettings) },
+            onAbout = { navigator.push(Dest.About) },
         )
+        Dest.About -> AboutScreen(BuildConfig.VERSION_NAME)
         Dest.Equalizer -> app.podium.feature.settings.EqualizerScreen(settings, onBand = { navigator.push(Dest.EqualizerBand(it)) })
         is Dest.EqualizerBand -> app.podium.feature.settings.EqualizerBandScreen(settings, screen.band, onDone = { navigator.pop() })
         Dest.OnlineSources -> OnlineServiceScreen(graph.onlineService)

@@ -54,6 +54,10 @@ private val portugueseBrazil = mapOf(
     "Back" to "Voltar",
     "Play" to "Reproduzir",
     "Play next" to "Reproduzir a seguir",
+    "Add to favorites" to "Adicionar aos favoritos",
+    "Remove from favorites" to "Remover dos favoritos",
+    "Go to album" to "Ir para o álbum",
+    "Clear Up Next" to "Limpar fila",
     "Pause" to "Pausar",
     "Resume" to "Continuar",
     "Shuffle" to "Aleatório",
@@ -112,7 +116,14 @@ private val portugueseBrazil = mapOf(
     "Haptics" to "Resposta tátil",
     "Click sound" to "Som de clique",
     "Startup sound" to "Som de inicialização",
-    "Software update" to "Atualização do aplicativo",
+    "Software update" to "Atualização",
+    "About" to "Sobre",
+    "Version" to "Versão",
+    "Original creator" to "Criador original",
+    "Original repository" to "Repositório original",
+    "Modified by" to "Modificado por",
+    "Project repository" to "Repositório do projeto",
+    "License" to "Licença",
     "Language" to "Idioma",
     "System language" to "Idioma do sistema",
     "Português (Brasil)" to "Português (Brasil)",
@@ -325,6 +336,7 @@ private val portugueseBrazil = mapOf(
 private val countPattern = Regex("^(\\d+) (songs|albums|artists|minutes|seconds)$")
 
 private fun dynamicPortuguese(text: String): String {
+    if (text.startsWith("Go to ")) return "Ir para ${text.removePrefix("Go to ")}"
     countPattern.matchEntire(text)?.let { match ->
         val quantity = match.groupValues[1]
         val unit = when (match.groupValues[2]) {

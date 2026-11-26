@@ -44,7 +44,7 @@ jobs:
           PODIUM_KEY_PASSWORD: ${{ secrets.PODIUM_UPDATE_KEY_PASSWORD }}
         run: |
           version="${GITHUB_REF_NAME#v}"
-          version_code=$((GITHUB_RUN_NUMBER + 7))
+          version_code=$((GITHUB_RUN_NUMBER + 9))
           ./gradlew :app:assembleRelease \
             -Ppodium.applicationIdSuffix=.debug \
             -Ppodium.versionName="$version" \

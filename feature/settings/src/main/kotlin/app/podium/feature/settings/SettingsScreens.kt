@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -72,7 +73,7 @@ import app.podium.core.interaction.WheelContext
 import app.podium.core.interaction.rememberFocusListState
 import app.podium.core.interaction.rememberPodiumHaptics
 
-private enum class SettingsRow { Appearance, PodiumSpace, FullScreen, TitleBarBattery, NowPlayingLayout, HideNowPlayingTray, Keyboard, Language, MusicFolders, OnlineSources, Jellyfin, CustomSources, Autoplay, Recommendations, AvoidRepeats, Crossfade, StreamingBuffer, Equalizer, SleepTimer, OnlineLyrics, LyricsCredit, Haptics, Clicks, StartupSound, SoftwareUpdate }
+private enum class SettingsRow { Appearance, PodiumSpace, FullScreen, TitleBarBattery, NowPlayingLayout, HideNowPlayingTray, Keyboard, Language, MusicFolders, OnlineSources, Jellyfin, CustomSources, Autoplay, Recommendations, AvoidRepeats, Crossfade, StreamingBuffer, Equalizer, SleepTimer, OnlineLyrics, LyricsCredit, Haptics, Clicks, StartupSound, SoftwareUpdate, About }
 
 /** Settings ▸ Jellyfin library (D-34): an initial background sync plus a user-requested refresh. */
 interface JellyfinLibrarySyncSettings {
@@ -122,6 +123,7 @@ fun SettingsScreen(
     /** Settings ▸ Jellyfin: refresh the server library and its cached folder tree. */
     jellyfinSync: JellyfinLibrarySyncSettings? = null,
     onJellyfin: () -> Unit = {},
+    onAbout: () -> Unit = {},
 ) {
     val appearance by repository.appearance.collectAsStateWithLifecycle()
     val language by repository.language.collectAsStateWithLifecycle()
@@ -281,6 +283,7 @@ fun SettingsScreen(
                     ),
                 )
             }
+            SettingsRow.About -> onAbout()
         }
     }
     ListInputEffect(focus, onActivate = activate)
@@ -357,7 +360,45 @@ fun SettingsScreen(
             SettingsRow.Clicks -> MenuRow("Click sound", focused, value = if (clicksOn) "On" else "Off", showChevron = false)
             SettingsRow.StartupSound -> MenuRow("Startup sound", focused, value = if (startupSound) "On" else "Off", showChevron = false)
             SettingsRow.SoftwareUpdate -> MenuRow("Software update", focused, value = softwareUpdate?.version, showChevron = false)
+            SettingsRow.About -> MenuRow("About", focused)
         }
+    }
+}
+
+private data class AboutEntry(val label: String, val value: String, val url: String? = null)
+
+/** Settings ▸ About: version, upstream attribution, Jellyfin edition credit, and license links. */
+@Composable
+fun AboutScreen(version: String) {
+    val uriHandler = LocalUriHandler.current
+    val haptics = rememberPodiumHaptics()
+    val entries = remember(version) {
+        listOf(
+            AboutEntry("Version", version),
+            AboutEntry("Original creator", "GHOSTxASR"),
+            AboutEntry("Original repository", "github.com/GHOSTxASR/podium-music-player", "https://github.com/GHOSTxASR/podium-music-player"),
+            AboutEntry("Modified by", "José Casallecchio"),
+            AboutEntry("Project repository", "github.com/jcasallecchio/podium-music-player", "https://github.com/jcasallecchio/podium-music-player"),
+            AboutEntry("License", "GNU GPL v3.0", "https://github.com/jcasallecchio/podium-music-player/blob/main/LICENSE"),
+        )
+    }
+    val focus = rememberFocusListState("about")
+    val activate: (Int) -> Unit = { index ->
+        entries[index].url?.let(uriHandler::openUri) ?: haptics.reject()
+    }
+    ListInputEffect(focus, onActivate = activate)
+    FocusList(
+        items = entries,
+        state = focus,
+        key = { it.label },
+        contentPadding = LocalScreenInsets.current.listPadding(),
+        onActivate = activate,
+        preview = { MenuPreview.None },
+        paperApexFraction = 0.98f,
+        paperColumnWidthFraction = 0.68f,
+        modifier = Modifier.fillMaxSize(),
+    ) { entry, _, focused ->
+        MenuRow(entry.label, focused, value = entry.value, showChevron = entry.url != null)
     }
 }
 
